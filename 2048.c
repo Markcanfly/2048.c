@@ -21,6 +21,7 @@
 uint32_t score=0;
 uint32_t previousScore=0;
 uint8_t scheme=0;
+uint32_t undos=0;
 
 const int LEFT = 0;
 const int UP = 1;
@@ -48,8 +49,8 @@ void drawBoard(uint8_t board[SIZE][SIZE]) {
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
 
-	printf("2048.c %17d pts\n\n",score);
-
+	printf("2048.c %17d pts\n",score);
+	printf("                   %3d undos\n\n", undos);
 	for (y=0;y<SIZE;y++) {
 		for (x=0;x<SIZE;x++) {
 			getColor(board[x][y],color,40);
@@ -267,6 +268,7 @@ void initBoard(uint8_t board[SIZE][SIZE]) {
 	addRandom(board);
 	drawBoard(board);
 	score = 0;
+	undos = 0;
 }
 
 void setBufferedInput(bool enable) {
@@ -448,9 +450,12 @@ int main(int argc, char *argv[]) {
 			drawBoard(board);
 		}
 		if (c=='z') {
-			memcpy(board, prevBoard, SIZE*SIZE);
-			score = previousScore;
-			drawBoard(board);
+			if (memcmp(board, prevBoard, SIZE*SIZE) != 0) { // undo not used yet
+				memcpy(board, prevBoard, SIZE*SIZE);
+				score = previousScore;
+				undos++;
+				drawBoard(board);
+			}
 		}
 	}
 	setBufferedInput(true);
