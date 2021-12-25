@@ -19,6 +19,7 @@
 
 #define SIZE 4
 uint32_t score=0;
+uint32_t previousScore=0;
 uint8_t scheme=0;
 
 const int LEFT = 0;
@@ -363,6 +364,7 @@ void signal_callback_handler(int signum) {
 
 bool moveBoard(uint8_t previousBoard[SIZE][SIZE], uint8_t board[SIZE][SIZE], int direction) {
 	memcpy(previousBoard,board,SIZE*SIZE);
+	previousScore = score;
 	switch (direction) {
 		case LEFT: return moveLeft(board); break;
 		case UP:   return moveUp(board); 	break;
@@ -374,7 +376,6 @@ bool moveBoard(uint8_t previousBoard[SIZE][SIZE], uint8_t board[SIZE][SIZE], int
 int main(int argc, char *argv[]) {
 	uint8_t board[SIZE][SIZE];
 	uint8_t prevBoard[SIZE][SIZE];
-	// TODO previousPoint
 	char c;
 	bool success;
 
@@ -448,6 +449,7 @@ int main(int argc, char *argv[]) {
 		}
 		if (c=='z') {
 			memcpy(board, prevBoard, SIZE*SIZE);
+			score = previousScore;
 			drawBoard(board);
 		}
 	}
