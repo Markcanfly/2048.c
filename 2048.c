@@ -21,6 +21,11 @@
 uint32_t score=0;
 uint8_t scheme=0;
 
+const int LEFT = 0;
+const int UP = 1;
+const int RIGHT = 2;
+const int DOWN = 3;
+
 void getColor(uint8_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
 	uint8_t blackwhite[] = {232,255,234,255,236,255,238,255,240,255,242,255,244,255,246,0,248,0,249,0,250,0,251,0,252,0,253,0,254,0,255,0};
@@ -356,8 +361,20 @@ void signal_callback_handler(int signum) {
 	exit(signum);
 }
 
+bool moveBoard(uint8_t previousBoard[SIZE][SIZE], uint8_t board[SIZE][SIZE], int direction) {
+	memcpy(previousBoard,board,SIZE*SIZE);
+	switch (direction) {
+		case LEFT: return moveLeft(board); break;
+		case UP:   return moveUp(board); 	break;
+		case RIGHT:return moveRight(board);break;
+		case DOWN: return moveDown(board); break;
+	} return false; // should never happen
+}
+
 int main(int argc, char *argv[]) {
 	uint8_t board[SIZE][SIZE];
+	uint8_t prevBoard[SIZE][SIZE];
+	// TODO previousPoint
 	char c;
 	bool success;
 
@@ -388,19 +405,19 @@ int main(int argc, char *argv[]) {
 			case 97:	// 'a' key
 			case 104:	// 'h' key
 			case 68:	// left arrow
-				success = moveLeft(board);  break;
+				success = moveBoard(prevBoard, board, LEFT);  break;
 			case 100:	// 'd' key
 			case 108:	// 'l' key
 			case 67:	// right arrow
-				success = moveRight(board); break;
+				success = moveBoard(prevBoard, board, RIGHT); break;
 			case 119:	// 'w' key
 			case 107:	// 'k' key
 			case 65:	// up arrow
-				success = moveUp(board);    break;
+				success = moveBoard(prevBoard, board, UP);    break;
 			case 115:	// 's' key
 			case 106:	// 'j' key
 			case 66:	// down arrow
-				success = moveDown(board);  break;
+				success = moveBoard(prevBoard, board, DOWN);  break;
 			default: success = false;
 		}
 		if (success) {
@@ -427,6 +444,10 @@ int main(int argc, char *argv[]) {
 			if (c=='y') {
 				initBoard(board);
 			}
+			drawBoard(board);
+		}
+		if (c=='z') {
+			memcpy(board, prevBoard, SIZE*SIZE);
 			drawBoard(board);
 		}
 	}
